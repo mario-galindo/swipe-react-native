@@ -20,13 +20,19 @@ const App = () => {
     }))
   );
 
-  const closeRow = (rowMap,rowKey) => {
-    
-  }
+  const closeRow = (rowMap, rowKey) => {
+    if (rowMap[rowKey]) {
+      rowMap[rowKey].closeRow();
+    }
+  };
 
-  const deleteRow = () => {
-
-  }
+  const deleteRow = (rowMap,rowKey) => {
+    closeRow(rowMap, rowKey);
+    const newData = [...listData];
+    const prevIndex = listData.findIndex((item) => item.key == rowKey);
+    newData.splice(prevIndex, 1);
+    setListData(newData);
+  };
 
   const VisibleItem = (props) => {
     const { data } = props;
@@ -50,20 +56,26 @@ const App = () => {
     return <VisibleItem data={data} />;
   };
 
-  const HiddenItemWithActions = props => {
-    const {onClose,onDelete} = props;
-    return(
+  const HiddenItemWithActions = (props) => {
+    const { onClose, onDelete } = props;
+    return (
       <View style={styles.rowBack}>
         <Text>Left</Text>
-        <TouchableOpacity style={[styles.backRightBtn,styles.backRightBtnLeft]}>
+        <TouchableOpacity
+          style={[styles.backRightBtn, styles.backRightBtnLeft]}
+          onPress={onClose}
+        >
           <Text>Close</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.backRightBtn,styles.backRightBtnRight]}>
+        <TouchableOpacity
+          style={[styles.backRightBtn, styles.backRightBtnRight]}
+          onPress={onDelete}
+        >
           <Text>Delete</Text>
         </TouchableOpacity>
       </View>
-    )
-  }
+    );
+  };
 
   const renderHiddenItem = (data, rowMap) => {
     return (
