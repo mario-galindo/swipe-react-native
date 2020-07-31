@@ -58,7 +58,7 @@ const App = () => {
   };
 
   const HiddenItemWithActions = (props) => {
-    const { onClose, onDelete } = props;
+    const { swipeAnimatedValue, onClose, onDelete } = props;
     return (
       <View style={styles.rowBack}>
         <Text>Left</Text>
@@ -78,13 +78,28 @@ const App = () => {
           style={[styles.backRightBtn, styles.backRightBtnRight]}
           onPress={onDelete}
         >
-          <View style={styles.trash}>
+          <Animated.View
+            style={[
+              styles.trash,
+              {
+                transform: [
+                  {
+                    scale: swipeAnimatedValue.interpolate({
+                      inputRange: [-90, -45],
+                      outputRange: [1, 0],
+                      extrapolate: "clamp",
+                    }),
+                  },
+                ],
+              },
+            ]}
+          >
             <MaterialCommunityIcons
               name="trash-can-outline"
               size={25}
               color="#FFF"
             />
-          </View>
+          </Animated.View>
         </TouchableOpacity>
       </View>
     );
