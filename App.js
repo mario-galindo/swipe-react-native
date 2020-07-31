@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { SwipeListView } from "react-native-swipe-list-view";
 import Notifications from "./Notifications";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const App = () => {
   const [listData, setListData] = useState(
@@ -26,7 +27,7 @@ const App = () => {
     }
   };
 
-  const deleteRow = (rowMap,rowKey) => {
+  const deleteRow = (rowMap, rowKey) => {
     closeRow(rowMap, rowKey);
     const newData = [...listData];
     const prevIndex = listData.findIndex((item) => item.key == rowKey);
@@ -65,13 +66,25 @@ const App = () => {
           style={[styles.backRightBtn, styles.backRightBtnLeft]}
           onPress={onClose}
         >
-          <Text>Close</Text>
+          <View style={styles.trash}>
+            <MaterialCommunityIcons
+              name="close-circle-outline"
+              size={25}
+              color="#FFF"
+            />
+          </View>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.backRightBtn, styles.backRightBtnRight]}
           onPress={onDelete}
         >
-          <Text>Delete</Text>
+          <View style={styles.trash}>
+            <MaterialCommunityIcons
+              name="trash-can-outline"
+              size={25}
+              color="#FFF"
+            />
+          </View>
         </TouchableOpacity>
       </View>
     );
