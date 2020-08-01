@@ -35,10 +35,49 @@ const App = () => {
     setListData(newData);
   };
 
+  const onRowDidOpen = (rowKey) => {
+    //console.log("This row opened", rowKey);
+  };
+
+  const onLeftActionStatusChange = (rowKey) => {
+    //console.log("onLeftActionStatusChange", rowKey);
+  };
+
+  const onRightActionStatusChange = (rowKey) => {
+    //console.log("onRightActionStatusChange", rowKey);
+  };
+
+  const onRightAction = (rowKey) => {
+    //console.log("onRightAction", rowKey);
+  };
+
+  const onLeftAction = (rowKey) => {
+    //console.log("onLeftAction", rowKey);
+  };
+
   const VisibleItem = (props) => {
-    const { data } = props;
+    const {
+      data,
+      rowHeightAnimatedValue,
+      removeRow,
+      leftActionState,
+      rightActionState,
+    } = props;
+
+    if (rightActionState) {
+      Animated.timing(rowHeightAnimatedValue, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: false,
+      }).start(() => {
+        removeRow();
+      });
+    }
+
     return (
-      <View style={styles.rowFront}>
+      <Animated.View
+        style={[styles.rowFront, { height: rowHeightAnimatedValue }]}
+      >
         <TouchableHighlight style={styles.rowFrontVisible}>
           <View>
             <Text style={styles.title} numberOfLines={1}>
@@ -49,67 +88,110 @@ const App = () => {
             </Text>
           </View>
         </TouchableHighlight>
-      </View>
+      </Animated.View>
     );
   };
 
   const renderItem = (data, rowMap) => {
-    return <VisibleItem data={data} />;
+    const rowHeightAnimatedValue = new Animated.Value(60);
+    return (
+      <VisibleItem
+        data={data}
+        rowHeightAnimatedValue={rowHeightAnimatedValue}
+        removeRow={() => deleteRow(rowMap, data.item.key)}
+      />
+    );
   };
 
   const HiddenItemWithActions = (props) => {
-    const { swipeAnimatedValue, onClose, onDelete } = props;
+    const {
+      swipeAnimatedValue,
+      leftActionActivated,
+      rightActionActivated,
+      rowActionAnimatedValue,
+      rowHeightAnimatedValue,
+      onClose,
+      onDelete,
+    } = props;
+
+    if (rightActionActivated) {
+      Animated.spring(rowActionAnimatedValue, {
+        toValue: 500,
+        useNativeDriver: false,
+      }).start();
+    }else {
+      Animated.spring(rowActionAnimatedValue, {
+        toValue: 75,
+        useNativeDriver: false
+      }).start();
+    }
+
     return (
-      <View style={styles.rowBack}>
+      <Animated.View style={[styles.rowBack, {height: rowHeightAnimatedValue}]}>
         <Text>Left</Text>
-        <TouchableOpacity
-          style={[styles.backRightBtn, styles.backRightBtnLeft]}
-          onPress={onClose}
-        >
-          <View style={styles.trash}>
+        {!leftActionActivated && (
+          <TouchableOpacity
+            style={[styles.backRightBtn, styles.backRightBtnLeft]}
+            onPress={onClose}>
             <MaterialCommunityIcons
               name="close-circle-outline"
               size={25}
-              color="#FFF"
+              style={styles.trash}
+              color="#fff"
             />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.backRightBtn, styles.backRightBtnRight]}
-          onPress={onDelete}
-        >
+          </TouchableOpacity>
+        )}
+        {!leftActionActivated && (
           <Animated.View
             style={[
-              styles.trash,
+              styles.backRightBtn,
+              styles.backRightBtnRight,
               {
-                transform: [
-                  {
-                    scale: swipeAnimatedValue.interpolate({
-                      inputRange: [-90, -45],
-                      outputRange: [1, 0],
-                      extrapolate: "clamp",
-                    }),
-                  },
-                ],
+                flex: 1,
+                width: rowActionAnimatedValue,
               },
-            ]}
-          >
-            <MaterialCommunityIcons
-              name="trash-can-outline"
-              size={25}
-              color="#FFF"
-            />
+            ]}>
+            <TouchableOpacity
+              style={[styles.backRightBtn, styles.backRightBtnRight]}
+              onPress={onDelete}>
+              <Animated.View
+                style={[
+                  styles.trash,
+                  {
+                    transform: [
+                      {
+                        scale: swipeAnimatedValue.interpolate({
+                          inputRange: [-90, -45],
+                          outputRange: [1, 0],
+                          extrapolate: 'clamp',
+                        }),
+                      },
+                    ],
+                  },
+                ]}>
+                <MaterialCommunityIcons
+                  name="trash-can-outline"
+                  size={25}
+                  color="#fff"
+                />
+              </Animated.View>
+            </TouchableOpacity>
           </Animated.View>
-        </TouchableOpacity>
-      </View>
+        )}
+      </Animated.View>
     );
   };
 
   const renderHiddenItem = (data, rowMap) => {
+    const rowActionAnimatedValue = new Animated.Value(75);
+    const rowHeightAnimatedValue = new Animated.Value(65);
+
     return (
       <HiddenItemWithActions
         data={data}
         rowMap={rowMap}
+        rowActionAnimatedValue={rowActionAnimatedValue}
+        rowHeightAnimatedValue={rowHeightAnimatedValue}
         onClose={() => closeRow(rowMap, data.item.key)}
         onDelete={() => deleteRow(rowMap, data.item.key)}
       />
@@ -124,6 +206,16 @@ const App = () => {
         renderHiddenItem={renderHiddenItem}
         leftOpenValue={75}
         rightOpenValue={-150}
+        disableRightSwipe
+        onRowDidOpen={onRowDidOpen}
+        leftActivationValue={100}
+        rightActivationValue={-200}
+        leftActionValue={0}
+        rightActionValue={-500}
+        onLeftAction={onLeftAction}
+        onRightAction={onRightAction}
+        onLeftActionStatusChange={onLeftActionStatusChange}
+        onRightActionStatusChange={onRightActionStatusChange}
       />
     </View>
   );
