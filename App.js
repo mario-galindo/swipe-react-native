@@ -67,7 +67,7 @@ const App = () => {
     if (rightActionState) {
       Animated.timing(rowHeightAnimatedValue, {
         toValue: 0,
-        duration: 200,
+        duration: 0,
         useNativeDriver: false,
       }).start(() => {
         removeRow();
